@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Drug Metabolism Visualization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="App.css">
+
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useEffect, useRef } = React;
+
+    function App() {
+      const [activeDot, setActiveDot] = React.useState(3);
+      const femaleParticlesRef = useRef(null);
+      const maleParticlesRef = useRef(null);
+
+      useEffect(() => {
+    class MetabolismViz {
+      constructor() {
+        this.init();
+      }
+
+      init() {
+        this.setupParticles();
+        this.startAnimation();
+      }
+
+      setupParticles() {
+        // Create female particles
+        this.createParticles('femaleParticles', '#ec4899', {
+              count: 25,
+          speed: 0.6,
+              size: { min: 2, max: 6 }
+        });
+
+        // Create male particles  
+        this.createParticles('maleParticles', '#3b82f6', {
+              count: 28,
+          speed: 0.8,
+              size: { min: 2, max: 7 }
+        });
+      }
+
+      createParticles(containerId, color, config) {
+        const container = document.getElementById(containerId);
+            if (!container) return;
+        
+        for (let i = 0; i < config.count; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          
+          const size = Math.random() * (config.size.max - config.size.min) + config.size.min;
+          const startX = Math.random() * 100;
+          const startY = Math.random() * 100;
+          const delay = Math.random() * 6;
+          
+          Object.assign(particle.style, {
+            width: `${size}px`,
+            height: `${size}px`,
+            left: `${startX}%`,
+            top: `${startY}%`,
+            background: color,
+            animationDelay: `${delay}s`,
+            animationDuration: `${8 + Math.random() * 6}s`
+          });
+          
+          container.appendChild(particle);
+        }
+      }
+
+      startAnimation() {
+        // Start with ingestion (dot 3) - pills falling
+        setTimeout(() => {
+          const femalePill = document.getElementById('femalePill');
+          const malePill = document.getElementById('malePill');
+          
+          if (femalePill) {
+          femalePill.style.setProperty('--fall-duration', '3s');
+          femalePill.style.setProperty('--dissolve-duration', '6s');
+          femalePill.classList.add('falling');
+          }
+          
+          if (malePill) {
+          malePill.style.setProperty('--fall-duration', '2.5s');
+          malePill.style.setProperty('--dissolve-duration', '3.5s');
+          malePill.classList.add('falling');
+          }
+          
+          // After pills finish falling, automatically transition to metabolism (dot 4)
+          setTimeout(() => {
+            // Change to dot 4 and show metabolism
+            if (window.setActiveDot) {
+              window.setActiveDot(4);
+            }
+            
+            // Smooth transition from falling to dissolving - keep pill where it landed
+            if (femalePill) {
+              // Don't change transform - let pill dissolve where it fell
+              femalePill.classList.remove('falling');
+              femalePill.classList.add('dissolving');
+              femalePill.style.setProperty('--dissolve-duration', '6s');
+              this.createBubbles('female', 25, 6000);
+            }
+            
+            if (malePill) {
+              // Don't change transform - let pill dissolve where it fell
+              malePill.classList.remove('falling');
+              malePill.classList.add('dissolving');
+              malePill.style.setProperty('--dissolve-duration', '3.5s');
+              this.createBubbles('male', 30, 3500);
+            }
+          }, 2500); // Start dissolving after pill falls
+        }, 3000); // Wait for intro titles to fade and headers to appear
+      }
+
+      createBubbles(type, count, duration) {
+        const container = document.getElementById(type === 'female' ? 'femaleParticles' : 'maleParticles');
+            if (!container) return;
+        
+        for (let i = 0; i < count; i++) {
+          setTimeout(() => {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            const size = Math.random() * 8 + 4;
+            const startX = 45 + Math.random() * 10;
+            const bubbleDuration = 2000 + Math.random() * 1500;
+            
+            Object.assign(bubble.style, {
+              width: `${size}px`,
+              height: `${size}px`,
+              left: `${startX}%`,
+              bottom: '40%',
+              '--bubble-duration': `${bubbleDuration}ms`
+            });
+            
+            container.appendChild(bubble);
+            
+            setTimeout(() => {
+              if (bubble.parentNode) bubble.remove();
+            }, bubbleDuration);
+          }, i * (duration / count));
+        }
+      }
+
+      resetAnimation() {
+        const femalePill = document.getElementById('femalePill');
+        const malePill = document.getElementById('malePill');
+        
+        // Clear all animations and classes
+        if (femalePill) {
+        femalePill.className = 'pill';
+          femalePill.style.animation = '';
+          femalePill.style.transform = '';
+        }
+        if (malePill) {
+        malePill.className = 'pill';
+          malePill.style.animation = '';
+          malePill.style.transform = '';
+        }
+        
+        // Reset to dot 3 (ingestion) before starting animation
+        if (window.setActiveDot) {
+          window.setActiveDot(3);
+        }
+        
+        setTimeout(() => this.startAnimation(), 200);
+      }
+
+      // Method to handle dot state changes
+      handleDotChange(dotNumber) {
+        const femalePill = document.getElementById('femalePill');
+        const malePill = document.getElementById('malePill');
+
+        // Reset all animations and clear inline styles
+        [femalePill, malePill].forEach(pill => {
+          if (pill) {
+            pill.classList.remove('falling', 'dissolving');
+            pill.style.cssText = '';
+          }
+        });
+
+        if (dotNumber === 3) {
+          // Ingestion state - show falling pills
+          setTimeout(() => {
+            if (femalePill) femalePill.classList.add('falling');
+            if (malePill) malePill.classList.add('falling');
+          }, 100);
+        } else if (dotNumber === 4) {
+          // Metabolism state - show dissolving pills and create bubbles
+          setTimeout(() => {
+            if (femalePill) {
+              femalePill.classList.add('dissolving');
+              femalePill.style.setProperty('--dissolve-duration', '6s');
+              this.createBubbles('female', 25, 6000);
+            }
+            if (malePill) {
+              malePill.classList.add('dissolving');
+              malePill.style.setProperty('--dissolve-duration', '3.5s');
+              this.createBubbles('male', 30, 3500);
+            }
+          }, 100);
+        } else {
+          // For dots 1 and 2, just show static pills
+          setTimeout(() => {
+            if (femalePill) femalePill.style.transform = 'translate(-50%, 190px)';
+            if (malePill) malePill.style.transform = 'translate(-50%, 190px)';
+          }, 100);
+        }
+      }
+    }
+
+    // Initialize visualization
+      const viz = new MetabolismViz();
+      
+      // Make viz accessible globally for dot interactions
+      window.metabolismViz = viz;
+      
+      // Make setActiveDot function available globally for automatic progression
+      window.setActiveDot = null;
+      
+        // Add interactive click effects
+        const addInteractivity = () => {
+          const femalePanel = document.getElementById('female');
+          const malePanel = document.getElementById('male');
+          
+          if (femalePanel) {
+            femalePanel.addEventListener('click', () => {
+              viz.resetAnimation();
+              femalePanel.style.animation = 'none';
+              setTimeout(() => {
+                femalePanel.style.animation = 'femaleGlow 4s ease-in-out infinite';
+              }, 100);
+            });
+          }
+          
+          if (malePanel) {
+            malePanel.addEventListener('click', () => {
+              viz.resetAnimation();
+              malePanel.style.animation = 'none';
+              setTimeout(() => {
+                malePanel.style.animation = 'maleGlow 4s ease-in-out infinite';
+              }, 100);
+            });
+          }
+          
+          // Add chart dot interactions
+          const chartDots = document.querySelectorAll('.chart-dot');
+          chartDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+              chartDots.forEach(d => d.classList.remove('active'));
+              dot.classList.add('active');
+              viz.resetAnimation();
+            });
+          });
+        };
+        
+        // Initialize interactivity
+        setTimeout(addInteractivity, 1000);
+        
+        // Restart animation every 12 seconds (longer for better experience)
+        const intervalId = setInterval(() => viz.resetAnimation(), 12000);
+
+        return () => {
+          clearInterval(intervalId);
+        };
+      }, []);
+
+      // Make setActiveDot available globally for automatic progression
+      useEffect(() => {
+        window.setActiveDot = setActiveDot;
+      }, [setActiveDot]);
+
+      // Effect to handle dot interactions and pill states
+      useEffect(() => {
+        if (window.metabolismViz) {
+          window.metabolismViz.handleDotChange(activeDot);
+        }
+      }, [activeDot]);
+
+      return React.createElement('div', { className: 'container' }, [
+        // Intro title and header that appear in center initially
+        React.createElement('div', { className: 'intro-titles', id: 'introTitles', key: 'introTitles' }, [
+          React.createElement('h1', { className: 'main-title', key: 'mainTitle' }, 'Drug Metabolism Comparison'),
+          React.createElement('h2', { className: 'main-header', key: 'mainHeader' }, 'GENDER-BASED METABOLIC DIFFERENCES')
+        ]),
+        React.createElement('div', { className: 'panel female', id: 'female', key: 'female' }, [
+          React.createElement('div', { className: 'header', key: 'header' }, [
+            React.createElement('div', { className: 'icon female-icon', key: 'icon' }, 
+              React.createElement('svg', { width: '28', height: '28', viewBox: '0 0 28 28', fill: 'none' }, [
+                React.createElement('circle', { cx: '14', cy: '14', r: '12', stroke: '#ec4899', strokeWidth: '1.5', fill: 'rgba(236,72,153,0.08)', key: 'circle' }),
+                React.createElement('path', { d: 'M10 14l2 2 4-4', stroke: '#ec4899', strokeWidth: '1.5', strokeLinecap: 'round', strokeLinejoin: 'round', key: 'check' })
+              ])
+            ),
+            React.createElement('h1', { className: 'title', key: 'title' }, 'Female Metabolism'),
+            React.createElement('p', { className: 'subtitle', key: 'subtitle' }, 'Sustained Processing')
+          ]),
+          
+          React.createElement('div', { className: 'viz-area', key: 'viz' }, [
+            React.createElement('div', { className: 'sea', key: 'sea' }, [
+              React.createElement('div', { className: 'wave-layer', key: 'wave1' }),
+              React.createElement('div', { className: 'wave-layer-2', key: 'wave2' }),
+              React.createElement('div', { className: 'wave-layer-3', key: 'wave3' }),
+              React.createElement('svg', { 
+                className: 'wave-svg', 
+                viewBox: '0 0 1200 200', 
+                preserveAspectRatio: 'none',
+                key: 'svg'
+              }, [
+                React.createElement('ellipse', {
+                  cx: '600',
+                  cy: '200',
+                  rx: '700',
+                  ry: '80',
+                  fill: 'rgba(249,194,216,0.25)',
+                  key: 'backgroundOval'
+                }),
+                React.createElement('path', {
+                  d: 'M0,200 Q600,50 1200,200 Z',
+                  fill: 'var(--female-wave)',
+                  key: 'path1'
+                }),
+
+              ])
+            ]),
+            React.createElement('div', { className: 'pill', id: 'femalePill', key: 'pill' }),
+            React.createElement('div', { className: 'particles', id: 'femaleParticles', ref: femaleParticlesRef, key: 'particles' }),
+            React.createElement('div', { className: 'chart-dots', key: 'dots' }, [
+              React.createElement('div', { className: `chart-dot ${activeDot === 1 ? 'active' : ''}`, key: 'dot1', onClick: () => setActiveDot(1) }),
+              React.createElement('div', { className: `chart-dot ${activeDot === 2 ? 'active' : ''}`, key: 'dot2', onClick: () => setActiveDot(2) }),
+              React.createElement('div', { className: `chart-dot ${activeDot === 3 ? 'active' : ''}`, key: 'dot3', onClick: () => setActiveDot(3) }),
+              React.createElement('div', { className: `chart-dot ${activeDot === 4 ? 'active' : ''}`, key: 'dot4', onClick: () => setActiveDot(4) })
+            ]),
+            
+            // Progress bars for metabolism duration (only show when dissolving)
+            activeDot === 4 ? React.createElement('div', { className: 'metabolism-info female-metabolism', key: 'metabolism' }, [
+              React.createElement('div', { className: 'metabolism-header', key: 'header' }, [
+                React.createElement('div', { className: 'metabolism-icon', key: 'icon' }, '♀'),
+                React.createElement('div', { className: 'metabolism-title', key: 'title' }, 'CYP450: Gentle Activity')
+              ]),
+              React.createElement('div', { className: 'metabolism-duration', key: 'duration' }, [
+                React.createElement('div', { className: 'duration-icon', key: 'dicon' }, '⏱'),
+                React.createElement('div', { className: 'duration-text', key: 'dtext' }, 'Duration: Extended (8.2h)')
+              ]),
+              React.createElement('div', { className: 'progress-bar-container', key: 'progress' }, [
+                React.createElement('div', { className: 'progress-bar female-progress', key: 'bar' })
+              ])
+            ]) : null
+          ])
+        ]),
+
+        React.createElement('div', { className: 'panel male', id: 'male', key: 'male' }, [
+          React.createElement('div', { className: 'header', key: 'header' }, [
+            React.createElement('div', { className: 'icon male-icon', key: 'icon' }, 
+              React.createElement('svg', { width: '28', height: '28', viewBox: '0 0 28 28', fill: 'none' }, [
+                React.createElement('circle', { cx: '14', cy: '14', r: '12', stroke: '#3b82f6', strokeWidth: '1.5', fill: 'rgba(59,130,246,0.08)', key: 'circle' }),
+                React.createElement('path', { d: 'M9 14l3 3 6-6', stroke: '#3b82f6', strokeWidth: '1.5', strokeLinecap: 'round', strokeLinejoin: 'round', key: 'arrow' })
+              ])
+            ),
+            React.createElement('h1', { className: 'title', key: 'title' }, 'Male Metabolism'),
+            React.createElement('p', { className: 'subtitle', key: 'subtitle' }, 'Rapid Processing')
+          ]),
+          
+          React.createElement('div', { className: 'viz-area', key: 'viz' }, [
+            React.createElement('div', { className: 'sea', key: 'sea' }, [
+              React.createElement('div', { className: 'wave-layer', key: 'wave1' }),
+              React.createElement('div', { className: 'wave-layer-2', key: 'wave2' }),
+              React.createElement('div', { className: 'wave-layer-3', key: 'wave3' }),
+                            React.createElement('svg', {
+                className: 'wave-svg', 
+                viewBox: '0 0 1200 200', 
+                preserveAspectRatio: 'none',
+                key: 'svg'
+              }, [
+                React.createElement('ellipse', {
+                  cx: '600',
+                  cy: '200',
+                  rx: '700',
+                  ry: '80',
+                  fill: 'rgba(169,191,242,0.25)',
+                  key: 'backgroundOval'
+                }),
+                React.createElement('path', {
+                  d: 'M0,200 Q600,50 1200,200 Z',
+                  fill: 'var(--male-wave)',
+                  key: 'path1'
+                }),
+
+              ])
+            ]),
+            React.createElement('div', { className: 'pill', id: 'malePill', key: 'pill' }),
+            React.createElement('div', { className: 'particles', id: 'maleParticles', ref: maleParticlesRef, key: 'particles' }),
+            React.createElement('div', { className: 'dot-label', key: 'label' }, 
+              activeDot === 3 ? 'INGESTION' : 
+              activeDot === 4 ? 'METABOLISM' : 
+              activeDot === 1 ? 'ABSORPTION' : 'DISTRIBUTION'
+            ),
+            
+            // Progress bars for metabolism duration (only show when dissolving)
+            activeDot === 4 ? React.createElement('div', { className: 'metabolism-info male-metabolism', key: 'metabolism' }, [
+              React.createElement('div', { className: 'metabolism-header', key: 'header' }, [
+                React.createElement('div', { className: 'metabolism-icon', key: 'icon' }, '♂'),
+                React.createElement('div', { className: 'metabolism-title', key: 'title' }, 'Hepatic: Enhanced')
+              ]),
+              React.createElement('div', { className: 'metabolism-duration', key: 'duration' }, [
+                React.createElement('div', { className: 'duration-icon', key: 'dicon' }, '⏱'),
+                React.createElement('div', { className: 'duration-text', key: 'dtext' }, 'Duration: Accelerated (4.1h)')
+              ]),
+              React.createElement('div', { className: 'progress-bar-container', key: 'progress' }, [
+                React.createElement('div', { className: 'progress-bar male-progress', key: 'bar' })
+              ])
+            ]) : null
+          ])
+        ])
+      ]);
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+
+    // Add skip button after a delay
+    setTimeout(() => {
+      const skipButton = document.createElement('button');
+      skipButton.innerHTML = 'Skip to Dashboard →';
+      skipButton.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+      `;
+      
+      skipButton.addEventListener('click', () => {
+        window.location.href = 'dashboard_comparison.html';
+      });
+      
+      skipButton.addEventListener('mouseenter', () => {
+        skipButton.style.transform = 'translateY(-2px)';
+        skipButton.style.boxShadow = '0 6px 20px rgba(236, 72, 153, 0.4)';
+      });
+      
+      skipButton.addEventListener('mouseleave', () => {
+        skipButton.style.transform = 'translateY(0)';
+        skipButton.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.3)';
+      });
+      
+      document.body.appendChild(skipButton);
+    }, 3000); // Show skip button after 3 seconds
+
+    // Auto-transition after metabolism animations complete
+    setTimeout(() => {
+      // Create a fade-out effect
+      document.body.style.transition = 'opacity 1s ease-out';
+      document.body.style.opacity = '0';
+      
+      // Redirect to next page after fade-out
+      setTimeout(() => {
+        // Redirect to interactive dashboard
+        window.location.href = 'dashboard_comparison.html';
+      }, 1000);
+    }, 10000); // Wait 10 seconds for complete metabolism sequence
+    </script>
+  </body>
+</html>

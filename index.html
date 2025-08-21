@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FemPharma AI — Loading</title>
+
+  <!-- font (online) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="C:\Users\Earth\Desktop\combinedproject-main (2)\combinedproject-main\css/styles.css" />
+
+  <style>
+    /* Loading screen styles */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fefefa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .pill {
+      width: 30px;
+      height: 15px;
+      border: 2px solid #d9d5c9;
+      border-radius: 15px;
+      position: relative;
+      animation: spin 1s linear infinite;
+    }
+
+    .pill::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background: #d9d5c9;
+      transform: translateX(-50%);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Main content initially hidden */
+    .main-content {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease-in, visibility 0.5s ease-in;
+    }
+
+    .main-content.show {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="pill"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <div class="page-bg"></div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo">
+          <div class="logo-bubble">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <div class="logo-text">FemPharma AI</div>
+        </div>
+        <nav class="top-nav">
+          <a href="#">Evidence-backed insights</a>
+          <a href="#">FDA Compliant</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1 class="hero-title">AI Gender-Based Drug Dose Risk Detector</h1>
+          <p class="hero-sub">96% of Drugs Harm Women More: Slow Metabolism Causes Higher Overdose Risk</p>
+        </div>
+      </section>
+
+      <section class="stats-section">
+        <div class="container">
+          <div class="stats-card" id="statsCard">
+            <div class="stats-row">
+              <div class="stat" data-index="0">
+                <div class="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
+                  </svg>
+                </div>
+                <div class="stat-value"><span class="count" data-target="400" data-suffix="%">0</span></div>
+                <div class="stat-label">Overdose Rise</div>
+              </div>
+
+              <div class="stat" data-index="1">
+                <div class="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7 14l5-5 5 5z"/>
+                    <path d="M12 9v10"/>
+                  </svg>
+                </div>
+                <div class="stat-value"><span class="count" data-target="260" data-suffix="%">0</span></div>
+                <div class="stat-label">Overdose Death Rise</div>
+              </div>
+
+              <div class="stat" data-index="2">
+                <div class="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                  </svg>
+                </div>
+                <div class="stat-value"><span class="count" data-target="2" data-suffix="x">0</span></div>
+                <div class="stat-label">ADR Higher Risk</div>
+              </div>
+
+              <div class="stat" data-index="3">
+                <div class="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7.01 5 5 7.01 5 9.5S7.01 14 9.5 14 14 11.99 14 9.5 11.99 5 9.5 5Z"/>
+                    <path d="M10.29 8.44L9.5 6l-.79 2.44H6.25l2.01 1.52-.77 2.4L9.5 10.8l2.01 1.56-.77-2.4 2.01-1.52h-2.46Z"/>
+                  </svg>
+                </div>
+                <div class="stat-value"><span class="count" data-target="96" data-suffix="%">0</span></div>
+                <div class="stat-label">Higher Side-Effect Risk</div>
+              </div>
+            </div>
+
+            <div class="stats-indicator">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="container features-row" id="featuresRow">
+          <article class="feature">
+            <div class="feature-icon green">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
+              </svg>
+            </div>
+            <h3>Enhanced Safety</h3>
+            <p>AI-powered prediction for women's physiology</p>
+          </article>
+
+          <article class="feature">
+            <div class="feature-icon violet">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L9 9H1l6.5 5L5 23l7-5 7 5-2.5-9L23 9h-8l-3-8z"/>
+              </svg>
+            </div>
+            <h3>AI Trained System</h3>
+            <p>Machine learning optimized for women's metabolism</p>
+          </article>
+
+          <article class="feature">
+            <div class="feature-icon pink">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+            </div>
+            <h3>FDA Data-Supported</h3>
+            <p>Evidence-based insights from regulatory data</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="C:\Users\Earth\Desktop\combinedproject-main (2)\combinedproject-main\js/animations.js"></script>
+  <script>
+    // Loading sequence
+    window.addEventListener('DOMContentLoaded', () => {
+      // Hide loading screen and show main content after 1 second
+      setTimeout(() => {
+        document.getElementById('loadingScreen').classList.add('fade-out');
+        document.getElementById('mainContent').classList.add('show');
+      }, 1000);
+
+      // Auto-redirect to metabolism page after showing content for 10 seconds
+      setTimeout(() => {
+        window.location.href = 'metabolism.html';
+      }, 11000);
+    });
+  </script>
+</body>
+</html>

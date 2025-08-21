@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Women-Centered Drug Safety AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fb;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .brand-text h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+    
+    .brand-text p {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    .header-stats {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .dashboard-nav {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-link:hover {
+      color: #ec4899;
+      background: rgba(236, 72, 153, 0.1);
+    }
+    
+    /* Main Layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 500px 1fr;
+      gap: 32px;
+    }
+    
+    /* Card Styles */
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+    
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+    
+    .card-content {
+      padding: 28px;
+    }
+    
+    /* Patient Parameters */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    
+    /* Gender Toggle */
+    .gender-toggle {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .gender-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .gender-btn:hover {
+      border-color: #d1d5db;
+    }
+    
+    .gender-btn.active.male {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    
+    .gender-btn.active.female {
+      border-color: #ec4899;
+      background: #fdf2f8;
+      color: #be185d;
+    }
+    
+    /* Form Inputs */
+    .form-select, .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1f2937;
+      background: white;
+      transition: border-color 0.2s ease;
+    }
+    
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Slider */
+    .slider-container {
+      margin: 12px 0;
+    }
+    
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e5e7eb;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      position: relative;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ec4899;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ec4899;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .slider-track {
+      height: 6px;
+      background: linear-gradient(90deg, #ec4899 0%, #ec4899 var(--value, 50%), #e5e7eb var(--value, 50%), #e5e7eb 100%);
+      border-radius: 3px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+    }
+    
+    .slider-value {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #7c3aed;
+      margin-top: 8px;
+    }
+    
+    .demo-note {
+      font-size: 12px;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 12px;
+    }
+    
+    .info-section {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .info-section h4 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .info-section h5 {
+      margin: 16px 0 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .info-section p {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+    
+    .info-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .info-section li {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    
+    /* Compare Button */
+    .compare-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 24px;
+    }
+    
+    .compare-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+    
+    .compare-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Risk Analysis Panel */
+    .chart-container {
+      height: 250px;
+      margin: 16px 0;
+      position: relative;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .chart-title {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .legend-dot.female {
+      background: #ec4899;
+    }
+    
+    .legend-dot.male {
+      background: #3b82f6;
+    }
+    
+    /* Risk Cards */
+    .risk-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    
+    .risk-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 14px;
+      border-left: 4px solid transparent;
+    }
+    
+    .risk-card.male {
+      border-left-color: #3b82f6;
+    }
+    
+    .risk-card.female {
+      border-left-color: #ec4899;
+    }
+    
+    .risk-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .risk-card-icon {
+      font-size: 16px;
+    }
+    
+    .risk-card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .risk-percentage {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+      animation: countUp 1s ease-out;
+    }
+    
+    .risk-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+    
+    /* Info Boxes */
+    .info-box {
+      margin: 12px 0;
+      padding: 14px;
+      border-radius: 8px;
+      border-left: 4px solid;
+    }
+    
+    .info-box.risk-difference {
+      background: #fef2f2;
+      border-left-color: #ef4444;
+    }
+    
+    .info-box.personalized {
+      background: #f0fdf4;
+      border-left-color: #22c55e;
+    }
+    
+    .info-box.metabolic {
+      background: #f8fafc;
+      border-left-color: #64748b;
+    }
+    
+    .info-box-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .info-box-content {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .risk-difference .info-box-title {
+      color: #dc2626;
+    }
+    
+    .personalized .info-box-title {
+      color: #16a34a;
+    }
+    
+    .metabolic .info-box-title {
+      color: #475569;
+    }
+    
+    /* Loading States */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .error-message {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    
+    .success-message {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .risk-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#ec4899"/>
+            <path d="M8 12h3l2 8 2-8h2l2 8 2-8h3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Women-Centered Drug Safety AI</h1>
+          <p>Personalized medicine through female-focused analysis</p>
+        </div>
+      </div>
+      <nav class="dashboard-nav">
+        <a href="metabolism.html" class="nav-link">← Back to Visualization</a>
+        <a href="index.html" class="nav-link">Home</a>
+      </nav>
+    </div>
+    
+    <div class="main-layout">
+      <!-- Patient Parameters -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Patient Parameters</h3>
+        </div>
+        <div class="card-content">
+          
+          <div class="form-group">
+            <label class="form-label">Biological Sex</label>
+            <div class="gender-toggle">
+              <button id="male-btn" class="gender-btn male">Male</button>
+              <button id="female-btn" class="gender-btn female active">Female</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Age (years)</label>
+            <select id="age-select" class="form-select">
+              <option value="25">25</option>
+              <option value="35">35</option>
+              <option value="45" selected>45</option>
+              <option value="55">55</option>
+              <option value="65">65</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Medication</label>
+            <select id="medication-select" class="form-select">
+              <option value="">Select medication...</option>
+              <option value="Sertraline">Sertraline</option>
+              <option value="Warfarin">Warfarin</option>
+              <option value="Digoxin">Digoxin</option>
+              <option value="Propranolol">Propranolol</option>
+              <option value="Acetaminophen">Acetaminophen</option>
+              <option value="Zolpidem">Zolpidem</option>
+              <option value="Amlodipine">Amlodipine (BP)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Dosage</label>
+            <div class="slider-container">
+              <input type="range" id="dosage-slider" class="slider" min="25" max="200" value="100">
+              <div class="slider-value" id="dosage-value">100 mg</div>
+            </div>
+          </div>
+          
+          <button id="compare-btn" class="compare-btn">
+            Compare Male vs Female Risk
+          </button>
+          
+          <div id="error-container"></div>
+          
+
+        </div>
+      </div>
+      
+      <!-- Risk Analysis -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Risk Analysis</h3>
+          <div class="chart-title">Adverse Event Risk (% over time)</div>
+        </div>
+        <div class="card-content">
+          <div class="chart-container">
+            <canvas id="riskChart"></canvas>
+          </div>
+          
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-dot female"></div>
+              <span>Female</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot male"></div>
+              <span>Male</span>
+            </div>
+          </div>
+          
+          <!-- Risk Cards -->
+          <div class="risk-cards" id="risk-cards" style="display: none;">
+            <div class="risk-card male">
+              <div class="risk-card-header">
+                <span class="risk-card-icon">♂</span>
+                <span class="risk-card-title">Male Patient</span>
+              </div>
+              <div class="risk-percentage" id="male-risk">--%</div>
+              <div class="risk-label" id="male-label">LOW RISK</div>
+            </div>
+            
+            <div class="risk-card female">
+              <div class="risk-card-header">
+                <span class="risk-card-icon">♀</span>
+                <span class="risk-card-title">Female Patient</span>
+              </div>
+              <div class="risk-percentage" id="female-risk">--%</div>
+              <div class="risk-label" id="female-label">LOW RISK</div>
+            </div>
+          </div>
+          
+          <!-- Info Boxes -->
+          <div id="info-boxes" style="display: none;">
+            <div class="info-box risk-difference">
+              <div class="info-box-title" id="difference-title">Risk Difference: --</div>
+              <div class="info-box-content" id="difference-content">
+                Analyzing gender-based pharmacokinetic differences...
+              </div>
+            </div>
+            
+            <div class="info-box personalized">
+              <div class="info-box-title">Personalized Dosing</div>
+              <div class="info-box-content" id="dosing-recommendation">
+                Recommended: -- mg (optimized for female metabolism)
+              </div>
+            </div>
+            
+            <div class="info-box metabolic">
+              <div class="info-box-title">Metabolic Insight</div>
+              <div class="info-box-content" id="metabolic-insight">
+                Pharmacokinetic sex differences may alter drug exposure.
+              </div>
+            </div>
+          </div>
+          
+          <div id="default-content">
+            <div style="text-align: left; padding: 40px; color: #374151; line-height: 1.6;">
+              <h4 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #1f2937;">Gender-Aware Risk Analysis</h4>
+              <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.5;">Select patient parameters to see how the same medication affects men and women differently.</p>
+              
+              <h5 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1f2937;">Key Differences:</h5>
+              <div style="margin-left: 0; font-size: 15px; line-height: 1.7;">
+                <div style="margin-bottom: 8px;">• Women metabolize many drugs slower than men</div>
+                <div style="margin-bottom: 8px;">• Body composition affects drug distribution</div>
+                <div style="margin-bottom: 8px;">• Hormonal cycles influence drug clearance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API Configuration
+    const API_BASE = 'http://127.0.0.1:5000';
+    let chart = null;
+    
+
+    
+    // DOM Elements
+    const maleBtn = document.getElementById('male-btn');
+    const femaleBtn = document.getElementById('female-btn');
+    const ageSelect = document.getElementById('age-select');
+    const medicationSelect = document.getElementById('medication-select');
+    const dosageSlider = document.getElementById('dosage-slider');
+    const dosageValue = document.getElementById('dosage-value');
+    const compareBtn = document.getElementById('compare-btn');
+    const errorContainer = document.getElementById('error-container');
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      setupChart();
+      checkApiConnection();
+    });
+    
+    function setupEventListeners() {
+      // Gender toggle
+      maleBtn.addEventListener('click', () => {
+        maleBtn.classList.add('active');
+        femaleBtn.classList.remove('active');
+      });
+      
+      femaleBtn.addEventListener('click', () => {
+        femaleBtn.classList.add('active');
+        maleBtn.classList.remove('active');
+      });
+      
+      // Dosage slider
+      dosageSlider.addEventListener('input', (e) => {
+        dosageValue.textContent = `${e.target.value} mg`;
+        // Update slider track
+        const percent = ((e.target.value - e.target.min) / (e.target.max - e.target.min)) * 100;
+        e.target.style.setProperty('--value', `${percent}%`);
+      });
+      
+      // Medication change - update dosage ranges
+      medicationSelect.addEventListener('change', updateDosageRange);
+      
+      // Compare button
+      compareBtn.addEventListener('click', performComparison);
+    }
+    
+
+    
+    function updateDosageRange() {
+      const medication = medicationSelect.value;
+      const ranges = {
+        'Sertraline': { min: 25, max: 200, default: 100 },
+        'Warfarin': { min: 1, max: 15, default: 5 },
+        'Digoxin': { min: 1, max: 5, default: 2 },
+        'Propranolol': { min: 10, max: 320, default: 80 },
+        'Acetaminophen': { min: 325, max: 4000, default: 1000 },
+        'Zolpidem': { min: 5, max: 10, default: 10 },
+        'Amlodipine': { min: 2.5, max: 10, default: 5 }
+      };
+      
+      if (medication && ranges[medication]) {
+        const range = ranges[medication];
+        dosageSlider.min = range.min;
+        dosageSlider.max = range.max;
+        dosageSlider.value = range.default;
+        dosageValue.textContent = `${range.default} mg`;
+        
+        // Update slider track
+        const percent = ((range.default - range.min) / (range.max - range.min)) * 100;
+        dosageSlider.style.setProperty('--value', `${percent}%`);
+      }
+    }
+    
+    async function checkApiConnection() {
+      try {
+        const response = await fetch(`${API_BASE}/`);
+        if (response.ok) {
+          showSuccess('✅ Connected to AI model');
+        }
+      } catch (error) {
+        showError('⚠️ API offline - please start the backend server');
+      }
+    }
+    
+    async function performComparison() {
+      const medication = medicationSelect.value;
+      if (!medication) {
+        showError('Please select a medication first');
+        return;
+      }
+      
+      const age = parseInt(ageSelect.value);
+      const dose = parseInt(dosageSlider.value);
+      const duration = 30; // Fixed duration for this demo
+      
+      // Show loading
+      compareBtn.disabled = true;
+      compareBtn.textContent = '🔄 Analyzing...';
+      
+      try {
+        // Get predictions for both genders
+        const [maleResult, femaleResult] = await Promise.all([
+          makePrediction('Male', age, medication, dose, duration),
+          makePrediction('Female', age, medication, dose, duration)
+        ]);
+        
+        if (maleResult && femaleResult) {
+          displayResults(maleResult, femaleResult, dose);
+          updateChart(maleResult, femaleResult);
+        }
+        
+      } catch (error) {
+        showError(`Analysis failed: ${error.message}`);
+      } finally {
+        compareBtn.disabled = false;
+        compareBtn.textContent = '🧠 Compare Male vs Female Risk';
+      }
+    }
+    
+
+    
+    async function makePrediction(gender, age, medication, dose, duration) {
+      // Handle Amlodipine by mapping it to a similar medication for demo
+      let mappedMedication = medication;
+      if (medication === 'Amlodipine') {
+        mappedMedication = 'Propranolol'; // Map to similar cardiovascular drug
+      }
+      
+      const response = await fetch(`${API_BASE}/predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gender, age, medication: mappedMedication, dose, duration })
+      });
+      
+      if (response.ok) {
+        return await response.json();
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Prediction failed');
+      }
+    }
+    
+    function displayResults(maleResult, femaleResult, dose) {
+      // Show result sections
+      document.getElementById('risk-cards').style.display = 'grid';
+      document.getElementById('info-boxes').style.display = 'block';
+      document.getElementById('default-content').style.display = 'none';
+      
+      // Update risk cards
+      const maleRisk = Math.round(maleResult.prediction.risk_probability * 100);
+      const femaleRisk = Math.round(femaleResult.prediction.risk_probability * 100);
+      
+      document.getElementById('male-risk').textContent = `${maleRisk}%`;
+      document.getElementById('female-risk').textContent = `${femaleRisk}%`;
+      document.getElementById('male-label').textContent = maleResult.prediction.risk_label;
+      document.getElementById('female-label').textContent = femaleResult.prediction.risk_label;
+      
+      // Calculate difference
+      const difference = femaleRisk - maleRisk;
+      const absDiff = Math.abs(difference);
+      
+      // Update difference box
+      document.getElementById('difference-title').textContent = 
+        `Risk Difference: ${difference >= 0 ? '+' : ''}${difference}% higher risk for women`;
+      
+      let diffDescription = '';
+      if (absDiff >= 15) {
+        diffDescription = '🔴 SIGNIFICANT difference! Consider gender-specific dosing and closer monitoring for women.';
+      } else if (absDiff >= 8) {
+        diffDescription = '🟡 MODERATE difference. Monitor women more closely and consider dose adjustment.';
+      } else {
+        diffDescription = '🟢 MINIMAL difference. Standard dosing appears appropriate for both genders.';
+      }
+      
+      document.getElementById('difference-content').textContent = diffDescription;
+      
+      // Update dosing recommendation
+      const recommendedDose = difference > 10 ? Math.round(dose * 0.8) : dose;
+      document.getElementById('dosing-recommendation').textContent = 
+        `Recommended: ${recommendedDose} mg ${difference > 10 ? '(reduced for women)' : '(standard for both)'}`;
+      
+      // Update metabolic insight
+      const medication = medicationSelect.value;
+      const insights = {
+        'Sertraline': 'Women metabolize SSRIs ~40% slower, leading to higher plasma concentrations.',
+        'Warfarin': 'Women have higher bleeding risk due to different metabolism and body composition.',
+        'Digoxin': 'Women typically have higher serum levels due to different kidney function.',
+        'Propranolol': 'Women show higher bioavailability due to differences in first-pass metabolism.',
+        'Acetaminophen': 'Women have slower clearance, increasing hepatotoxicity risk.',
+        'Zolpidem': 'FDA required dose reduction for women due to 45% higher drug exposure.',
+        'Amlodipine': 'Women may experience greater blood pressure reduction and peripheral edema.'
+      };
+      
+      document.getElementById('metabolic-insight').textContent = 
+        insights[medication] || 'Pharmacokinetic sex differences may alter drug exposure.';
+    }
+    
+    function setupChart() {
+      const ctx = document.getElementById('riskChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['1 hour', '4 hours', '8 hours', '12 hours', '48 hours'],
+          datasets: [{
+            label: 'Female',
+            data: [20, 22, 25, 26, 28],
+            borderColor: '#ec4899',
+            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+            tension: 0.4,
+            pointRadius: 6,
+            pointBorderWidth: 2,
+            pointBorderColor: '#ec4899',
+            pointBackgroundColor: '#ffffff'
+          }, {
+            label: 'Male',
+            data: [18, 19, 20, 20, 22],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            pointRadius: 6,
+            pointBorderWidth: 2,
+            pointBorderColor: '#3b82f6',
+            pointBackgroundColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              },
+              grid: {
+                color: '#f3f4f6'
+              }
+            },
+            x: {
+              grid: {
+                color: '#f3f4f6'
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function updateChart(maleResult, femaleResult) {
+      if (chart) {
+        const maleRisk = maleResult.prediction.risk_probability * 100;
+        const femaleRisk = femaleResult.prediction.risk_probability * 100;
+        
+        // Generate time series data based on predictions
+        const femaleData = [
+          femaleRisk * 0.7,
+          femaleRisk * 0.85,
+          femaleRisk * 0.95,
+          femaleRisk,
+          femaleRisk * 1.1
+        ];
+        
+        const maleData = [
+          maleRisk * 0.8,
+          maleRisk * 0.9,
+          maleRisk * 0.95,
+          maleRisk,
+          maleRisk * 1.05
+        ];
+        
+        chart.data.datasets[0].data = femaleData;
+        chart.data.datasets[1].data = maleData;
+        chart.update();
+      }
+    }
+    
+    function showError(message) {
+      errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+      setTimeout(() => errorContainer.innerHTML = '', 5000);
+    }
+    
+    function showSuccess(message) {
+      errorContainer.innerHTML = `<div class="success-message">${message}</div>`;
+      setTimeout(() => errorContainer.innerHTML = '', 3000);
+    }
+  </script>
+</body>
+</html>
